@@ -468,11 +468,7 @@ class CalcListener(ParseTreeListener):
 
     # Enter a parse tree produced by CalcParser#end_index.
     def enterWithForms(self, ctx):
-        try:
-            self.enter("WithForms", "%s|%s" % (ctx.ID()[0].getText(), ctx.ID()[1].getText()))
-        except Exception:
-            self.enter("WithForms", "%s|%s" % (ctx.ID()[0].getText(), ctx.ID()[0].getText()))
-
+        self.enter("WithForms")
 
     # Exit a parse tree produced by CalcParser#end_index.
     def exitWithForms(self, ctx):
@@ -484,4 +480,12 @@ class CalcListener(ParseTreeListener):
 
     # Exit a parse tree produced by CalcParser#end_index.
     def exitBreakStruct(self, ctx):
+        pass
+
+        # Enter a parse tree produced by CalcParser#end_index.
+    def enterConverter(self, ctx):
+        pass
+
+    # Exit a parse tree produced by CalcParser#end_index.
+    def exitConverter(self, ctx):
         pass

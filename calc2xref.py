@@ -1,10 +1,10 @@
 import sys
 import argparse
-
 import lxml.etree as etree
 import re
 from subprocess import check_output
 from antlr4.InputStream import InputStream
+import json
 
 from util import pretty_print, xslt
 from antrl_helper import antrl_parse, tree2xml
@@ -15,32 +15,25 @@ from converter_helper import process_converter
 
 if __name__ == '__main__':
 
-
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--formpath', action='store', dest='formset_dir',
-                        help='The directory of a compiled formset (in order to pull Primary Tool Ids)',
-                        required=True)
-    parser.add_argument('--fedformpath', action='store', dest='fedformset_dir',
-                        help='The directory of the federal compiled formset (in order to pull Primary Tool Ids)',
-    )
-
-    parser.add_argument('--calcfile', action='store', dest='calc_filename',
-                        help='The calc file (.clc) to be converted',
-                        required=True)
-    parser.add_argument('--cvtfile', action='store', dest='cvt_filename',
-                        help='Filename for converter file (.cvt)')
-
-    parser.add_argument('--outfile', action='store', dest='output_filename',
-                        help='Filename for output of xref')
-    parser.add_argument('--clpath', action='store', dest='cl_path',
-                        help='Path to cl.exe.  Usually in c:\Dev\TY15\tools')
+    parser.add_argument('--pref', action='store', dest='pref_file',
+                        help='The preferences file to use.',
+                        required=False,
+                        default='calc2xref.pref')
 
     parser.add_argument("--debug", help="Show parsing steps", default=False)
     arg = parser.parse_args()
     debug = arg.debug
+    print "\n....Loading preferences from: %s" %  arg.pref_file
+    with open(arg.pref_file) as settings_file:
+        settings = json.load(settings_file)
+    print "\n\n....Settings:"
+    print json.dumps(settings,indent=4)
+    print "\n\n"
 
-    preprocessed = preprocess_calc_file(arg.calc_filename, debug=arg.debug, cl_path=arg.cl_path)
+
+    preprocessed = preprocess_calc_file(settings['calc_filename'], debug=debug, cl_path=settings['cl_path'])
 
     print "\n\n\n"
     input_stream = InputStream(preprocessed)
@@ -53,7 +46,7 @@ if __name__ == '__main__':
         print "##ParseTreeWalker##"
         pretty_print(root)
 
-    process_converter(arg.cvt_filename, form_xml=root, debug=arg.debug, cl_path=arg.cl_path)
+    process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
 
     resolve_vars(root, use_tke=False)
     if debug:
@@ -69,7 +62,7 @@ if __name__ == '__main__':
 
     create_or_blocks(root)
 
-    set_pritool_descriptions(root, pritool_path=arg.formset_dir, fed_pritool_path=arg.fedformset_dir)
+    set_pritool_descriptions(root, pritool_path=settings['formset_dir'], fed_pritool_path=settings['fedformset_dir'])
 
     if debug:
         print "## tweaks ###"
@@ -87,8 +80,8 @@ if __name__ == '__main__':
     # HACK: final cleanup
     text = text.replace("<P/>", "<P></P>").replace("and </P>", "</P>").replace("<STARTP/>", "<P>").replace("<CLOSEP/>", "</P>\n")
 
-    if arg.output_filename:
-        with open(arg.output_filename, 'w') as f:
+    if settings['output_filename']:
+        with open(settings['output_filename'], 'w') as f:
             f.write(text)
     else:
         print text

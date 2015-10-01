@@ -98,7 +98,7 @@ def set_pritool_descriptions(root, pritool_path, fed_pritool_path):
         if elem:
             each = elem[0].get('name',each)
             node.set('desc',each)
-            node.set('formdesc',elem[0].getparent().get('longName',"####NO_LONGNAME_IN_PRITOOL###"))
+            node.set('formdesc',elem[0].getparent().get('longName',form + "_MISSING_LONGNAME"))
 
 
 def remove_duplicate_gotolines(root):

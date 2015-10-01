@@ -1,10 +1,13 @@
 grammar Calc;
 
-calcfile: formset constdecl? vardecl? section*;
+calcfile: (formset|converter) constdecl? vardecl? section*;
+
 
 formset :
     'FORM' ID  '.' form ';';
 
+converter: 'UPDATE' ID TO ID ';'
+           'DESCRIPTION' LITERAL ';';
 form: ID;
 
 section :
@@ -16,7 +19,7 @@ section :
 block: BEGIN stmt* END;
 
 stmt: (assign | call  | ret | block | forloopstruct | breakStruct ) ';' |  ifStruct | withForms;
-open_stmt: assign | call  | ret | block | forloopstruct|ifStruct;
+open_stmt: assign | call  | ret | block | forloopstruct|ifStruct | withForms;
 
 assign: full_id (LET|ALTLET|CRAZYLET) expr ;
 
@@ -36,8 +39,8 @@ expr : expr op=('/' | '*') expr #DivMul
 	| expr op=('>' | '<' | '<=' | '>=' | '=' | '<>' | '==') expr #Predicate
 	| LITERAL #Literal
 	| NOT expr #Not
-	| full_id #VarRef
 	| boolean  #Bool
+	| full_id #VarRef
 	| call #FunctionCall
 	| multicopy_accum #MultiCopyAccumulate
 	| 'MAX' '(' argList ')' #Max
@@ -60,7 +63,7 @@ ctrlStruct : ifStruct;
 	
 ifStruct : IF expr THEN open_stmt (';'|ELSE elseStruct)?;
 
-withForms: WITHFORMS '(' ID ',' ID ')' DO  stmt;
+withForms: WITHFORMS '(' full_id ',' full_id ')' DO  stmt;
 
 elseStruct: stmt;
 
@@ -139,7 +142,7 @@ LET : ':=' ;
 ALTLET: '?=';
 CRAZYLET: '#=';
 
-full_id : ID array_index? sub_id?;
+full_id : ID array_index? sub_id*;
 
 sub_id : '.' ID array_index?;
 ID : [a-zA-Z_][a-zA-Z_0-9]*;

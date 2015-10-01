@@ -7,4 +7,5 @@ build/*
 *.cvt
 *.exe
 *.xml
+*.pyc
 
