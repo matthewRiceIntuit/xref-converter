@@ -15,11 +15,12 @@ def preprocess_calc_file( calc_filename, debug, cl_path ):
     first_section = re.match("\w+", sections[1]).group()
 
 
+
     try:
         if not cl_path:
             cl_path='cl.exe'
         preproccessed = check_output([cl_path, '/EP', '-DPRO', '-DWIN', calc_filename],shell=True)
-        preproccessed = re.sub('\n\s+\n','\n',preproccessed)
+        preproccessed = re.sub('\n\s*\n','\n',preproccessed)
     except Exception, e:
         print "###### ERROR #####"
         print e
@@ -29,6 +30,7 @@ def preprocess_calc_file( calc_filename, debug, cl_path ):
 
         with open(calc_filename.split('/')[-1]) as f:
             preproccessed = f.read()
+        return preproccessed
 
 
 
@@ -52,8 +54,8 @@ def preprocess_calc_file( calc_filename, debug, cl_path ):
         print "######## PreProcessor ###########"
         print text
         print "\n\n\n\n"
-        if  "/" not in   calc_filename:
-            with open(calc_filename.split('\\')[-1],'w') as f:
-                f.write(text)
+        import ipdb;ipdb.set_trace()
+        with open(calc_filename.split('/')[-1],'w') as f:
+            f.write(text)
 
     return text

@@ -36,6 +36,7 @@ if __name__ == '__main__':
     preprocessed = preprocess_calc_file(settings['calc_filename'], debug=debug, cl_path=settings['cl_path'])
 
     print "\n\n\n"
+
     input_stream = InputStream(preprocessed)
 
     tree = antrl_parse(input_stream, debug)
@@ -46,7 +47,7 @@ if __name__ == '__main__':
         print "##ParseTreeWalker##"
         pretty_print(root)
 
-    process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
+    #process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
 
     resolve_vars(root, use_tke=False)
     if debug:

@@ -39,12 +39,12 @@ expr : expr op=('/' | '*') expr #DivMul
 	| expr op=('>' | '<' | '<=' | '>=' | '=' | '<>' | '==') expr #Predicate
 	| LITERAL #Literal
 	| NOT expr #Not
-	| boolean  #Bool
-	| full_id #VarRef
+	| ('True'|'TRUE'|'True'|'false'|'FALSE'|'False'|'Checked'|'checked'|'CHECKED') #Bool
 	| call #FunctionCall
 	| multicopy_accum #MultiCopyAccumulate
 	| 'MAX' '(' argList ')' #Max
 	| '(' expr ')'  #Parens
+	| full_id #VarRef
 	;
 argList : (expr (',' expr)*)? ;
 
@@ -60,7 +60,7 @@ r_type: arrayDecl? ID;
 arrayDecl: ARRAY '[' LITERAL ']' OF;
 
 ctrlStruct : ifStruct;
-	
+
 ifStruct : IF expr THEN open_stmt (';'|ELSE elseStruct)?;
 
 withForms: WITHFORMS '(' full_id ',' full_id ')' DO  stmt;
@@ -74,17 +74,17 @@ loopStruct : DO (WHILE preCond=expr)?
 forloopstruct: FOR ID ':=' expr TO expr DO  (block|stmt);
 
 breakStruct: BREAK;
-			
+
 ret : RETURN expr?  ;
-			
+
 function: retType=full_id fnName=full_id formParList
 		  vardecl?
           block ;
-          
+
 formParList : '(' formPar* ')' ;
 
 formPar : r_type name=full_id (LET defaultVal=expr)? ;
-		   
+
 LITERAL : INT
 	| STRING
 	;
