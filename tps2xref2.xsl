@@ -24,18 +24,10 @@
 
     <xsl:template match="Assign[@fed]">
         <xsl:variable name="formid" select="@FORMID"/>
-
-        <xsl:if test="not(*[2]//ID[starts-with(@val,$formid)])">
             <FIELDS>
                 <xsl:attribute name="FIELDIDS"><xsl:value-of select="@FIELDIDS"/></xsl:attribute>
                 <P>The <bf><xsl:if test="ID/@type='Dollar'">$</xsl:if><VALUEREF><xsl:attribute name="ADDR"><xsl:value-of select="ID/@val"/></xsl:attribute></VALUEREF><xsl:if test="starts-with(ID/@type,'Dec')">%</xsl:if></bf> in <xsl:value-of select="ID/@desc"/> comes from Federal <xsl:apply-templates select="*[2]" /></P>
             </FIELDS>
-        </xsl:if>
-
-
-
-
-
     </xsl:template>
 
     <xsl:template match="Assign[Boolean]"/>
@@ -76,7 +68,7 @@
     <xsl:template match="Max">the maximum of <xsl:apply-templates select="ArgList/*[1]"/> and <xsl:apply-templates select="ArgList/*[2]"/></xsl:template>
 
     <xsl:template match="Literal"><bf><xsl:value-of select="@val"/></bf></xsl:template>
-    <xsl:template match="VarRef"> <xsl:if test="not(.//ArrayIndex)">the <bf><xsl:if test="ID/@type='Dollar'">$</xsl:if><VALUEREF><xsl:attribute name="ADDR"><xsl:value-of select="ID/@val"/></xsl:attribute></VALUEREF><xsl:if test="starts-with(ID/@type,'Dec')">%</xsl:if></bf> in </xsl:if> <xsl:value-of select="ID/@desc"/>
+    <xsl:template match="VarRef"> <xsl:if test="not(.//ArrayIndex) and not(ID/@fed)">the <bf><xsl:if test="ID/@type='Dollar'">$</xsl:if><VALUEREF><xsl:attribute name="ADDR"><xsl:value-of select="ID/@val"/></xsl:attribute></VALUEREF><xsl:if test="starts-with(ID/@type,'Dec')">%</xsl:if></bf> in </xsl:if> <xsl:value-of select="ID/@desc"/>
     </xsl:template>
 
     <xsl:template match="VarRef[ID[@formdesc]]">form <xsl:value-of select="ID/@formdesc" />, <xsl:value-of select="ID/@desc"/></xsl:template>

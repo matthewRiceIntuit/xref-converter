@@ -15,7 +15,9 @@ from preprocess_helper import preprocess_calc_file
 def process_converter(filename, form_xml, debug, cl_path):
     if not filename:
         return None
-    form = form_xml.xpath('/CALC/FORMSET/FORM/@val')[0].upper()
+
+    if form_xml:
+        form = form_xml.xpath('/CALC/FORMSET/FORM/@val')[0].upper()
 
     preprocessed = preprocess_calc_file(filename, debug=True, cl_path=cl_path)
 
@@ -23,6 +25,7 @@ def process_converter(filename, form_xml, debug, cl_path):
     tree = antrl_parse(input_stream, debug)
     xml = tree2xml(tree)
     if debug:
+        print "##### parse converter: %s #####" % filename
         pretty_print(xml)
     withforms = xml.xpath('//WithForms[ID[1][@val="%s"]]' % form)
     if not withforms:
@@ -37,12 +40,14 @@ def process_converter(filename, form_xml, debug, cl_path):
 
         for id in each.getchildren()[1].xpath('.//ID'):
             id.set('val', "%s.%s" % (fedform, id.get('val').upper()))
+            id.set('fed','1')
 
 
     #Cleanup boolean\literal assigns
     for each in withforms.xpath(".//IfStruct/Assign[Boolean|Literal]"):
         each.getparent().remove(each)
 
+    print "##### withforms #####"
     pretty_print(withforms)
     form_xml.append(withforms)
 

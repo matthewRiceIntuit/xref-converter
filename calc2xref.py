@@ -32,7 +32,6 @@ if __name__ == '__main__':
     print json.dumps(settings,indent=4)
     print "\n\n"
 
-
     preprocessed = preprocess_calc_file(settings['calc_filename'], debug=debug, cl_path=settings['cl_path'])
 
     print "\n\n\n"
@@ -47,7 +46,7 @@ if __name__ == '__main__':
         print "##ParseTreeWalker##"
         pretty_print(root)
 
-    #process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
+    process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
 
     resolve_vars(root, use_tke=False)
 
@@ -67,7 +66,6 @@ if __name__ == '__main__':
     if debug:
         print "## tps2xref.xsl ##"
         text = pretty_print(root)
-
 
     root = xslt(root, 'tps2xref2.xsl')
     if debug:

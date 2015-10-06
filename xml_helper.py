@@ -21,7 +21,8 @@ def resolve_vars(root,use_tke=False):
 
         elif str(each.attrib['val']) in locals:
             each.attrib['val'] = "#"+each.attrib['val']
-
+        elif '.' in each.attrib['val']:
+            pass
         else:
             id= str("%s.%s" % (form,each.attrib['val']) ).upper()
             each.attrib['val'] = id
