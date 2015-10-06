@@ -24,12 +24,14 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="ID[starts-with(@val,'#')]">
-        <xsl:variable name="id" select="@val"/>
+    <xsl:template match="VarRef[ID[starts-with(@val,'#')]]">
+        <xsl:variable name="id" select="ID/@val"/>
         <xsl:for-each select="//Assign[ID/@val=$id]">
              <xsl:apply-templates select="*[2]" />
         </xsl:for-each>
     </xsl:template>
+
+    <xsl:template match="ArrayIndex"><ArrayIndex/></xsl:template>
 
 
 

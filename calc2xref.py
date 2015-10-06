@@ -50,24 +50,24 @@ if __name__ == '__main__':
     #process_converter(settings['cvt_filename'], form_xml=root, debug=debug, cl_path=settings['cl_path'])
 
     resolve_vars(root, use_tke=False)
+
+    fix_self_referencing_assigns(root)
+
     if debug:
         print "##ParseTreeWalker##"
         pretty_print(root)
 
-    fix_self_referencing_assigns(root)
 
     root = xslt(root, 'tps2xref.xsl')
-    if debug:
-        print "## tps2xref.xsl ##"
-        text = pretty_print(root)
 
     create_or_blocks(root)
 
     set_pritool_descriptions(root, pritool_path=settings['formset_dir'], fed_pritool_path=settings['fedformset_dir'])
 
     if debug:
-        print "## tweaks ###"
+        print "## tps2xref.xsl ##"
         text = pretty_print(root)
+
 
     root = xslt(root, 'tps2xref2.xsl')
     if debug:
@@ -81,9 +81,14 @@ if __name__ == '__main__':
     # HACK: final cleanup
     text = text.replace("<P/>", "<P></P>").replace("and </P>", "</P>").replace("<STARTP/>", "<P>").replace("<CLOSEP/>", "</P>\n")
 
+    if settings.get("close_tags","").lower() == 'true':
+        text =text.replace("/>",">")
+
     if settings['output_filename']:
+
         with open(settings['output_filename'], 'w') as f:
             f.write(text)
+        print "...Outputing file to:  %s" % settings['output_filename']
     else:
         print text
 

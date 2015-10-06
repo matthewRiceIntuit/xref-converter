@@ -365,21 +365,21 @@ class CalcListener(ParseTreeListener):
         # Enter a parse tree produced by CalcParser#full_id.
 
     def enterFull_id(self, ctx):
-        self.close("ID", ctx.ID().getText())
+        self.enter("ID", ctx.ID().getText())
 
 
     # Exit a parse tree produced by CalcParser#full_id.
     def exitFull_id(self, ctx):
-        pass
+        self.exit()
 
 
     # Enter a parse tree produced by CalcParser#sub_id.
     def enterSub_id(self, ctx):
-        self.close("Sub_ID", ctx.ID().getText())
+        self.enter("Sub_ID", ctx.ID().getText())
 
     # Exit a parse tree produced by CalcParser#sub_id.
     def exitSub_id(self, ctx):
-        pass
+        self.exit()
 
 
         # Enter a parse tree produced by CalcParser#PercentageOf.

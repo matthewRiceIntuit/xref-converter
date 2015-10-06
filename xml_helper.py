@@ -13,22 +13,20 @@ def resolve_vars(root,use_tke=False):
     form = root.xpath('/CALC/FORMSET/FORM/@val')[0]
 
     for each in root.xpath("//ID"):
-        if '.' in each.attrib['val']:
-            each.attrib['val'] = each.attrib['val'].upper()
-            continue
-        if str(each.attrib['val']) in locals:
-            each.attrib['val'] = "#"+each.attrib['val']
-            continue
 
-        e = each.getnext()
-        if None is e or e.tag != 'Sub_ID':
+        sub_id= each.xpath('Sub_ID')
+        if sub_id:
+            id= str("%s.%s" % (each.attrib['val'].upper(),sub_id[0].attrib['val'])).upper()
+            each.attrib['val'] = id
+
+        elif str(each.attrib['val']) in locals:
+            each.attrib['val'] = "#"+each.attrib['val']
+
+        else:
             id= str("%s.%s" % (form,each.attrib['val']) ).upper()
             each.attrib['val'] = id
 
-        else:
-            id= str("%s.%s" % (each.attrib['val'],e.attrib['val'])).upper()
-            each.attrib['val'] = id
-            e.getparent().remove(e)
+
 
 
 def fix_self_referencing_assigns(root):
@@ -36,8 +34,14 @@ def fix_self_referencing_assigns(root):
         id = each.xpath('ID[1]/@val')[0]
         nodes = each.xpath("*[2]//ID[@val='%s']" % id)
         for node in  nodes:
-            node.set('val', "SELF")
-            node.set('desc','SELF')
+            node.getparent().tag="SELF"
+            node.getparent().remove(node)
+    for each in root.xpath("//AddSub/SELF"):
+        parent = each.getparent()
+        parent.remove(each)
+        parent.getparent().append(parent.getchildren()[0])
+        parent.getparent().remove(parent)
+
 
 def create_or_blocks(root):
     ids=set()
@@ -77,7 +81,6 @@ def set_pritool_descriptions(root, pritool_path, fed_pritool_path):
         pritool = etree.parse('pritool.xml')
         fed_pritool = etree.parse('fed_pritool.xml')
 
-
     for node in root.xpath("//ID[@val]"):
         each = node.get('val').upper()
         try:
@@ -86,6 +89,7 @@ def set_pritool_descriptions(root, pritool_path, fed_pritool_path):
             elem = pritool.xpath("/CoreTemplateML/formSet/form[@id='%s']/field[@id='%s']" %( form, field))
             if elem:
                 each = elem[0].get('name',each)
+                node.set("type", elem[0].get("type",''))
             node.set('desc',each)
         except Exception:
             if not each =='SELF':

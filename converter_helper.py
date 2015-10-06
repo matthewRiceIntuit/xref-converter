@@ -13,7 +13,6 @@ from preprocess_helper import preprocess_calc_file
 
 
 def process_converter(filename, form_xml, debug, cl_path):
-    debug = True
     if not filename:
         return None
     form = form_xml.xpath('/CALC/FORMSET/FORM/@val')[0].upper()
@@ -42,17 +41,8 @@ def process_converter(filename, form_xml, debug, cl_path):
 
     #Cleanup boolean\literal assigns
     for each in withforms.xpath(".//IfStruct/Assign[Boolean|Literal]"):
-        each.remove(each.getchildren()[1])
-        ids = each.xpath('../*[1]//ID')
-        if len(ids)>1:
-            or_node = etree.SubElement(each, "or")
-            for id in ids:
-                or_node.append(id)
-        else:
-            each.append(ids[0])
+        each.getparent().remove(each)
 
     pretty_print(withforms)
-    import ipdb;ipdb.set_trace()
-
     form_xml.append(withforms)
 
